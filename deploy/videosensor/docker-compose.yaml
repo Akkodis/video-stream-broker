@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+
+  videosensor:
+    image: 5gmeta/video_sensor:latest
+    network_mode: "host"
+    environment:
+      - "AMQP_USER=user"
+      - "AMQP_PASS=password"
+      - "AMQP_IP=127.0.0.1"
+      - "AMQP_PORT=5673"
+      - "VIDEO_SOURCE=udp"
+      - "VIDEO_PARAM=8000"
+      - "VIDEO_TTL=7000"

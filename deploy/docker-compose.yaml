@@ -1,0 +1,21 @@
+version: '3.4'
+
+services:
+
+  videosensor:
+    image: 5gmeta/video_sensor:latest
+    environment:
+      - "AMQP_USER=user"
+      - "AMQP_PASS=password"
+      - "AMQP_IP=127.0.0.1"
+      - "AMQP_PORT=5673"
+      - "VIDEO_SOURCE=udp"
+      - "VIDEO_PARAM=7000"
+      - "VIDEO_TTL=100"
+  webrtcproxy:
+    image: 5gmeta/webrtc_proxy:latest
+    environment:
+      - "AMQP_IP=127.0.0.1"
+      - "AMQP_PORT=5673"
+      - "AMQP_PASS=password"
+      - "AMQP_USER=user"

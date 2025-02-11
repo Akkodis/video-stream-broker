@@ -1,0 +1,40 @@
+sequenceDiagram
+
+participant VideoSensor
+participant MessageBroker
+participant Registration
+participant WebRtcProxy
+participant Discovery
+
+note left of Discovery: Get the Serving \n 5GMETA MEC \n infrastructure
+VideoSensor->>Discovery: tile
+Discovery->>VideoSensor: <amqp-broker_ip, amqp-broker_port> \n , <registration_ip, registration_port> \n , <webRtcProxy_ip, webRtcProxy_port> for MEC systems
+
+note right of VideoSensor: Get ID to transmit
+VideoSensor->>Registration: <metadata>
+Registration->>VideoSensor: <id, metadata> 
+
+note right of VideoSensor: Send Keep Alive
+loop Wait for a sending trigger
+    VideoSensor->>Registration: <id, metadata>
+    alt Consumer ready
+        Registration->>VideoSensor: <id, metadata, start> 
+        
+        note right of VideoSensor: Negotiate start sending
+        VideoSensor->>MessageBroker: <id, params> \n [newDataFlow] 
+        MessageBroker->>WebRtcProxy: <id, params> \n [newDataFlow] 
+        note left of WebRtcProxy: Create <peerid> to receive
+        WebRtcProxy->>WebRtcProxy: Launch <peerid>
+        
+        note right of VideoSensor: Send Video Stream
+        VideoSensor-->>WebRtcProxy: Video Stream Session <id, peerid>
+    else No Consumer
+        Registration->>VideoSensor: <id, metadata, stop> 
+        
+        note right of VideoSensor: Stop/Timeout Video Stream
+        VideoSensor->>MessageBroker: <id> \n [terminateDataFlow]
+        MessageBroker->>WebRtcProxy: <id> \n [terminateDataFlow] 
+        note left of WebRtcProxy: Terminate <peerid> to receive
+        WebRtcProxy->>WebRtcProxy: Stop <peerid>
+    end
+end

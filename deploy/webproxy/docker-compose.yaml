@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+
+  webrtcproxy:
+    image: 5gmeta/webrtc_proxy:latest
+    network_mode: "host"
+    environment:
+      - "AMQP_IP=127.0.0.1"
+      - "AMQP_PORT=5673"
+      - "AMQP_PASS=password"
+      - "AMQP_USER=user"
